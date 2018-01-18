@@ -1,4 +1,4 @@
-package com.fismobile.mplat
+package com.netapp
 
 def login(String apiURL, String authToken) {
     sh """
