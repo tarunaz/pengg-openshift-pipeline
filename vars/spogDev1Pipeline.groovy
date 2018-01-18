@@ -41,61 +41,41 @@ def call(body) {
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
 		// Checkout openshift template files
-                checkout([$class: 'GitSCM', branches: [[name: config.templateGitTag]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'netapp-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a16fe3a9-b41b-4fe8-8f1a-55ae9607ad40', url: 'https://bitbucket.mfoundry.net/scm/~andrew.sandstrom/netapp-openshift.git']]])
-
-  
-		openshiftBuild bldCfg: 'spog-dev1', showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift-pipeline.git']]])
+                
+                pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml",
+                "BASE=${config.base} SOURCE_REPOSITORY_URL=ssh://git@ngage.netapp.com:7999/it-nss-apps/spog-ui.git SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.resourceName} ANGULAR_HOME_DIR=web", config.namespace, config.resourceName)
     	    }
 
-            stage('Checkout Source Code'){
-                // Checkout source code
-                def scmVars = checkout([$class: 'GitSCM', branches: [[name: config.developmentBranch]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'app-root']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a16fe3a9-b41b-4fe8-8f1a-55ae9607ad40', url: config.gitRepoUrl]]])
-                gitCommit = scmVars.GIT_COMMIT.take(7)
-                print "gitCommit: ${gitCommit}"
-                // Checkout template files (and maven settings file)
-                // TODO this settings file should be in a diff repo
-                // Using tags here for the template files for versioning
-                checkout([$class: 'GitSCM', branches: [[name: config.templateGitTag]], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'mplat-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a16fe3a9-b41b-4fe8-8f1a-55ae9607ad40', url: 'https://bitbucket.mfoundry.net/scm/~andrew.sandstrom/mplat-openshift.git']]])
 
-                // Process the pom for correct version number
-                pom = readMavenPom file: 'app-root/pom.xml'
-                revision = pom.properties.revision
-                // Using the base version + git commit to be the image tag as well as the version that will go on the
-                // artifacts built by maven
-                tag = revision + "-" + gitCommit
-                mavenArgs = baseMavenArgs + " -Dchangelist= -Dsha1=-${gitCommit}"
-            }
+            echo "Openshift Tag image with custom version number..."
+    	    stage('tag image') {
+                echo "Check out source code..."
+                git checkout scm
 
-           
-            pipelineUtils.unitTestAndPackageJar(config.mavenCredentialsId, "app-root/pom.xml", mavenArgs)
+                echo "readFile version "
+                def VERSION = readFile 'version'
+                echo "$VERSION"
+	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
+     	    }
 
-            pom = readMavenPom file: "app-root/${config.microserviceSubmodule}/pom.xml"
-            pipelineUtils.processTemplateAndStartBuild("mplat-openshift/mplat-openshift-system/openshift/templates/mplat-dsm-build-internal-registry-template.yml",
-                "APPLICATION_NAME=${config.microservice} OUTPUT_IMAGE_TAG=${tag}", "dsm-dev", config.microservice, "app-root/${config.microserviceSubmodule}/target/${pom.artifactId}-${tag}.jar")
-
-            sh """
-                oc apply -f app-root/openshift/config-maps/dsm-dev/ -R -n dsm-dev
-
-                oc process -f mplat-openshift/mplat-openshift-system/openshift/templates/mplat-dsm-deploy-internal-registry-ssl-template.yml \
-                    APPLICATION_NAME=${config.microservice} TAG=${tag} -n dsm-dev | oc apply -f - -n dsm-dev
-            """
-
-            stage('Deploy in dsm-dev'){
-                openshiftVerifyDeployment(
-                    depCfg: config.microservice,
-                    namespace: "dsm-dev",
-                    replicaCount: '1',
-                    apiURL: ocpUrl,
-                    authToken: jenkinsToken
-                )
-            }
-
-            pipelineUtils.apiTest(config.mavenCredentialsId, mavenArgs, config.microservice, "dsm-dev")
-
-         
-
-          
-
+	    echo "openshift import image at TPAAS..."
+	    stage('import image to TPAAS') {
+	        pipelineUtils.login(ocpUrl, jenkinsToken)
+	     
+	        sh "oc project tarun-spog"
+	        sh "oc import-image 'spog' --from=registry.netapp.com/nss/spog --confirm --all"
+	    }
+            
+	    echo "openshift deployement to TPAAS .."
+            stage('deploy to TPAAS') {
+		openshiftDeploy apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
+          		
+ 	    	echo "Verifying the deployment in TPASS..."
+            	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
+	    }
+		
+    }
         } // node
 
     } catch (err) {
