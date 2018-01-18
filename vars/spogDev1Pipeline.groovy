@@ -41,10 +41,17 @@ def call(body) {
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
 		// Checkout openshift template files
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift-pipeline.git']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift.git']]])
                 
                 pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml",
-                "BASE=${config.base} SOURCE_REPOSITORY_URL=ssh://git@ngage.netapp.com:7999/it-nss-apps/spog-ui.git SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.resourceName} ANGULAR_HOME_DIR=web", config.namespace, config.resourceName)
+                "BASE=${config.name} SOURCE_REPOSITORY_URL=ssh://git@ngage.netapp.com:7999/it-nss-apps/spog-ui.git SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.resourceName} ANGULAR_HOME_DIR=web", config.namespace, config.resourceName)
+
+                sh """
+    	           oc project ${config.namespace}
+
+                   oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
+                    NAME=${config.base} APPLICATION_IS_TAG_WEB=${config.resourceName} APPLICATION_IS_TAG_NS=${config.namespace} | oc apply -f - 
+            	"""
     	    }
 
 
