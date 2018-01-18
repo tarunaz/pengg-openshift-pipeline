@@ -49,5 +49,4 @@ def triggerDeploymentAndVerify(String microservice, String project,
         replicaCount: replicaCount,
         apiURL: ocpUrl
     )
-  }
 }
