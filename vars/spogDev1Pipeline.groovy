@@ -82,7 +82,11 @@ def call(body) {
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 		
+<<<<<<< HEAD
         } // node
+=======
+	} // node
+>>>>>>> e5c4037f72b040123e05c2fd852594bd53274675
 
     } catch (err) {
         currentBuild.result = 'FAILED'
