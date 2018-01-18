@@ -29,7 +29,7 @@ def processTemplateAndStartBuild(String templatePath, String parameters, String 
             oc process -f ${templatePath} ${parameters} -n ${project} | oc apply -f - -n ${project}
             //oc start-build ${buildConfigName} --follow -n ${project}
         """
-        openshiftBuild bldCfg: buildConfigName, showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
+        openshiftBuild bldCfg: ${buildConfigName}, showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
     }
 }
 
