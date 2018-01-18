@@ -82,7 +82,6 @@ def call(body) {
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 		
-    }
         } // node
 
     } catch (err) {
