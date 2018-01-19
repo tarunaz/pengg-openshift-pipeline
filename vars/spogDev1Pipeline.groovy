@@ -43,22 +43,21 @@ def call(body) {
 		// Checkout openshift template files
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift.git']]])
                 
-                //pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml",
-                //"BASE=${config.microservice} SOURCE_REPOSITORY_URL=${config.gitRepoUrl} SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${config.deployNamespace} authToken=${jenkinsToken} email_Address=${config.emailAddress}", config.buildNamespace, "${config.microservice}-${config.sourceRepositoryRef}")
+                pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml", "BASE=${config.microservice} SOURCE_REPOSITORY_URL=${config.gitRepoUrl} SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${config.deployNamespace} authToken=${jenkinsToken} email_Address=${config.emailAddress}", config.buildNamespace, "${config.microservice}-${config.sourceRepositoryRef}")
 
     	    }
 
 
             echo "Openshift Tag image with custom version number..."
-    	    //stage('tag image') {
-            //    echo "Check out source code..."
-            //    checkout scm
+    	    stage('tag image') {
+                echo "Check out source code..."
+                checkout scm
 
-            //    echo "readFile version "
-            //    def VERSION = readFile 'version'
-            //    echo "$VERSION"
-	    //    openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
-     	    
+                echo "readFile version "	
+                def VERSION = readFile 'version'
+                echo "$VERSION"
+	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
+	    }
 
 	    echo "openshift import image at TPAAS..."
 	    stage('import image to TPAAS') {
@@ -69,7 +68,7 @@ def call(body) {
     	           oc project "${config.deployNamespace}"
 
                    oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
-                    NAME=${config.base} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
+                    NAME=${config.microservice} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.deployNamespace} | oc apply -f - 
 
                    oc import-image 'spog' --from=registry.netapp.com/nss/spog --confirm --all
             	"""
@@ -78,10 +77,10 @@ def call(body) {
 	    echo "openshift deployement to TPAAS .."
             stage('deploy to TPAAS') {
            
-		openshiftDeploy apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
+		openshiftDeploy apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
  	    	echo "Verifying the deployment in TPASS..."
-            	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
+            	openshiftVerifyDeployment apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	  } // node
     } catch (err) {
