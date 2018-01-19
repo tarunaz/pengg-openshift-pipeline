@@ -79,10 +79,10 @@ def call(body) {
 	    echo "openshift deployement to TPAAS .."
             stage('deploy to TPAAS') {
            
-		openshiftDeploy apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
+		openshiftDeploy apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, authToken: "${jenkinsToken}",  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
  	    	echo "Verifying the deployment in TPASS..."
-            	openshiftVerifyDeployment apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
+            	openshiftVerifyDeployment apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, authToken: "${jenkinsToken}", replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	  } // node
     } catch (err) {
