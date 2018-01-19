@@ -67,7 +67,10 @@ def call(body) {
                 sh """
     	           oc project "${config.deployNamespace}"
 
-                   oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml NAME=${config.microservice} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.deployNamespace} | oc apply -f - 
+                   sleep  200
+
+                   oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
+                    NAME=${config.microservice} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.deployNamespace} | oc apply -f - 
 
                    oc import-image 'spog' --from=registry.netapp.com/nss/spog --confirm --all
             	"""
