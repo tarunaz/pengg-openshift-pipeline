@@ -53,7 +53,7 @@ def call(body) {
             echo "Openshift Tag image with custom version number..."
     	    stage('tag image') {
                 echo "readFile version "	
-                def VERSION = readFile 'version'
+                def VERSION = readFile 'app-root/version'
                 
 		echo "$VERSION"
 	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
@@ -66,8 +66,6 @@ def call(body) {
 	     
                 sh """
     	           oc project "${config.deployNamespace}"
-
-                   sleep  200
 
                    oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
                     NAME=${config.microservice} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.deployNamespace} | oc apply -f - 
