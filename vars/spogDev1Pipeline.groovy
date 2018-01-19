@@ -28,8 +28,9 @@ def call(body) {
     registryUrl = 'mobile-docker-1.repos.fismobile.com/test'
     def pipelineUtils = new PipelineUtils()
 
-volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
     try {
+
+	volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
 
         node('nodejs') {
             // Clean workspace before doing anything
@@ -87,11 +88,10 @@ volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	} // node
+      }
 
     } catch (err) {
         currentBuild.result = 'FAILED'
         throw err
     }
-  }
-
 }
