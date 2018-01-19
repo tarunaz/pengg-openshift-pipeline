@@ -36,12 +36,14 @@ def call(body) {
         ],
         volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
         
-	  node('nodejs') {
+	 node('nodejs') {
                 
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
 
-            sh "jenkinsToken = \$(cat /etc/jenkins/token)"
+	    sh """
+            	jenkinsToken = \$(cat /etc/jenkins/token)
+            """
 
             echo $jenkinToken
 
@@ -89,8 +91,8 @@ def call(body) {
  	    	echo "Verifying the deployment in TPASS..."
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
-	   } // node
-	 } 
+	  } // node
+	} 
     } catch (err) {
         currentBuild.result = 'FAILED'
         throw err
