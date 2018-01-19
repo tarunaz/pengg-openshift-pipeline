@@ -36,7 +36,7 @@ def call(body) {
       ],
       volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
         node('nodejs') {
-          container(name: 'nodejs', cloud: 'openshift') {
+          container('nodejs') {
             // Clean workspace before doing anything
             deleteDir()
 
