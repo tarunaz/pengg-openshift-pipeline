@@ -57,7 +57,7 @@ def call(body) {
                 echo "readFile version "
                 def VERSION = readFile 'version'
                 echo "$VERSION"
-	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 't1', verbose: 'false'
+	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
      	    }
 
 	    echo "openshift import image at TPAAS..."
