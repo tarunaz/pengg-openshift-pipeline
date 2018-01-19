@@ -52,7 +52,7 @@ def call(body) {
             echo "Openshift Tag image with custom version number..."
     	    stage('tag image') {
                 echo "Check out source code..."
-                git checkout scm
+                checkout scm
 
                 echo "readFile version "
                 def VERSION = readFile 'version'
