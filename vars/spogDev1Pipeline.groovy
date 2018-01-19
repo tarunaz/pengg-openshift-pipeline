@@ -42,12 +42,8 @@ def call(body) {
             env.SKIP_TLS = 'true'
             sleep 200
 
-	    sh """
-            	jenkinsToken = \$(cat /etc/jenkins/token)
-            """
-
-            echo $jenkinToken
-
+            jenkinsToken = readFile('/etc/jenkins/token')
+           
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
 		// Checkout openshift template files
