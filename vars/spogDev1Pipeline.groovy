@@ -44,7 +44,7 @@ def call(body) {
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift.git']]])
                 
                 pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml",
-                "BASE=${config.name} SOURCE_REPOSITORY_URL=ssh://git@ngage.netapp.com:7999/it-nss-apps/spog-ui.git SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${config.deployNamespace} authToken=${jenkinsToken} email_Address=${config.emailAddress}", config.buildNamespace, config.resourceName)
+                "BASE=${config.microservice} SOURCE_REPOSITORY_URL=ssh://git@ngage.netapp.com:7999/it-nss-apps/spog-ui.git SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${config.deployNamespace} authToken=${jenkinsToken} email_Address=${config.emailAddress}", config.buildNamespace, config.microservice)
 
     	    }
 
@@ -57,7 +57,7 @@ def call(body) {
                 echo "readFile version "
                 def VERSION = readFile 'version'
                 echo "$VERSION"
-	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
+	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 't1', verbose: 'false'
      	    }
 
 	    echo "openshift import image at TPAAS..."
@@ -68,7 +68,7 @@ def call(body) {
     	           oc project ${config.namespace}
 
                    oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
-                    NAME=${config.base} APPLICATION_IS_TAG_WEB=${config.resourceName} APPLICATION_IS_TAG_API=${config.resourceName} APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
+                    NAME=${config.base} APPLICATION_IS_TAG_WEB=${config.microservice}:{config.sourceRepositoryRef} APPLICATION_IS_TAG_API=${config.microservice}:{config.sourceRepositoryRef} APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
 
                    oc import-image 'spog' --from=registry.netapp.com/nss/spog --confirm --all
             	"""
@@ -77,7 +77,7 @@ def call(body) {
 	    echo "openshift deployement to TPAAS .."
             stage('deploy to TPAAS') {
            
-		openshiftDeploy apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
+		openshiftDeploy apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.namespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
  	    	echo "Verifying the deployment in TPASS..."
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
