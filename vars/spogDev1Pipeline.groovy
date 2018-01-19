@@ -40,6 +40,7 @@ def call(body) {
                 
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
+            sleep 200
 
 	    sh """
             	jenkinsToken = \$(cat /etc/jenkins/token)
