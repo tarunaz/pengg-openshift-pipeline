@@ -15,12 +15,7 @@ import com.netapp.PipelineUtils
    * @param artifactoryRepoName Artifactory repo name
    */
 
-podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
-  containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/home/jenkins')
-],
-volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
-
- def call(body) {
+def call(body) {
 
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
@@ -35,7 +30,11 @@ volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]
     def pipelineUtils = new PipelineUtils()
 
     try {
-
+   
+      podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
+         containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/home/jenkins')
+      ],
+      volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
         node('nodejs') {
           container(name: 'nodejs', cloud: 'openshift') {
             // Clean workspace before doing anything
@@ -92,13 +91,11 @@ volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]
  	    	echo "Verifying the deployment in TPASS..."
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
-	  }
-	} // node
-      }
-
+	  } // node
+	} 
     } catch (err) {
         currentBuild.result = 'FAILED'
         throw err
     }
- }
 }
+
