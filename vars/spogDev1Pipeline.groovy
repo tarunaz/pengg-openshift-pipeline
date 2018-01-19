@@ -34,8 +34,8 @@ def call(body) {
         podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
           containerTemplate(name: 'jnlp', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
         ],
-        volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins'),
-                 secretVolume(secretName: 'suchak', mountPath: '/etc/suchak')]) {
+        volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/tmp/jenkins'),
+                 secretVolume(secretName: 'suchak', mountPath: '/tmp/suchak')]) {
         
 	 node('nodejs') {
                 
@@ -44,7 +44,7 @@ def call(body) {
  	
             sleep 200
        
-            jenkinsToken = readFile('/etc/jenkins/token')
+            jenkinsToken = readFile('/tmp/jenkins/token')
            
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
