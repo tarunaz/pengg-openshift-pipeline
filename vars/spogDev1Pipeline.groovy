@@ -31,13 +31,13 @@ def call(body) {
 
     try {
    
-      podTemplate(label: 'nodejs-p', cloud: 'openshift', containers: [
-         containerTemplate(name: 'nodejs-c', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
-      ],
-      volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
-        node('nodejs-p') {
-          container('nodejs-c') {
+        podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
+          containerTemplate(name: 'jnlp', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
+        ],
+        volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
         
+	  node('nodejs') {
+                
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
 
@@ -65,7 +65,7 @@ def call(body) {
             //    def VERSION = readFile 'version'
             //    echo "$VERSION"
 	    //    openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
-     	    }
+     	    
 
 	    echo "openshift import image at TPAAS..."
 	    stage('import image to TPAAS') {
@@ -89,8 +89,8 @@ def call(body) {
  	    	echo "Verifying the deployment in TPASS..."
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
-	  } // node
-	} 
+	   } // node
+	 } 
     } catch (err) {
         currentBuild.result = 'FAILED'
         throw err
