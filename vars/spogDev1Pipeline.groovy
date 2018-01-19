@@ -32,12 +32,14 @@ def call(body) {
     try {
    
         podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
-          containerTemplate(name: 'jnlp', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
+          containerTemplate(name: 'jnlp', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp'),
+          containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
         ],
         volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/tmp/jenkins'),
                  secretVolume(secretName: 'suchak', mountPath: '/tmp/suchak')]) {
         
 	 node('nodejs') {
+           container('nodejs') {
                 
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
@@ -91,7 +93,7 @@ def call(body) {
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	  } // node
-	} 
+	}}
     } catch (err) {
         currentBuild.result = 'FAILED'
         throw err
