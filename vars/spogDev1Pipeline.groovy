@@ -68,7 +68,7 @@ def call(body) {
     	           oc project ${config.namespace}
 
                    oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
-                    NAME=${config.base} APPLICATION_IS_TAG_WEB=${config.microservice}:{config.sourceRepositoryRef} APPLICATION_IS_TAG_API=${config.microservice}:{config.sourceRepositoryRef} APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
+                    NAME=${config.base} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
 
                    oc import-image 'spog' --from=registry.netapp.com/nss/spog --confirm --all
             	"""
