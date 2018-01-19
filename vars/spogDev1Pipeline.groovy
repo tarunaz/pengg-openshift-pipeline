@@ -31,12 +31,12 @@ def call(body) {
 
     try {
    
-      podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
-         containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
+      podTemplate(label: 'nodejs-p', cloud: 'openshift', containers: [
+         containerTemplate(name: 'nodejs-c', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
       ],
       volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
-        node('nodejs') {
-          container('nodejs') {
+        node('nodejs-p') {
+          container('nodejs-c') {
         
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
