@@ -36,7 +36,7 @@ def call(body) {
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
        
-            jenkinsToken = readFile('/tmp/jenkins/token')
+            jenkinsToken = readFile('/etc/jenkins/token')
            
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
