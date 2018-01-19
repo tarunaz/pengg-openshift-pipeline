@@ -23,7 +23,7 @@ def call(body) {
     body()
 
     // Instantiate variables used in pipeline
-    ocpUrl = "tpaas-console.netapp.com"
+    ocpUrl = "https://tpaas-console.netapp.com:8443"
     jenkinsToken = ""
   
     registryUrl = 'mobile-docker-1.repos.fismobile.com/test'
