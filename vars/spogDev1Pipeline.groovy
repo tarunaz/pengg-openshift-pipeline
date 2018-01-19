@@ -34,14 +34,14 @@ def call(body) {
         podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
           containerTemplate(name: 'jnlp', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/tmp')
         ],
-        volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
+        volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins'),
+                 secretVolume(secretName: 'suchak', mountPath: '/etc/suchak')]) {
         
 	 node('nodejs') {
                 
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
-            sleep 200
-
+       
             jenkinsToken = readFile('/etc/jenkins/token')
            
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
