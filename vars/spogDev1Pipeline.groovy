@@ -28,7 +28,9 @@ def call(body) {
     registryUrl = 'mobile-docker-1.repos.fismobile.com/test'
     def pipelineUtils = new PipelineUtils()
 
+volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
     try {
+
         node('nodejs') {
             // Clean workspace before doing anything
             deleteDir()
@@ -36,7 +38,9 @@ def call(body) {
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
 
-            jenkinsToken = readFile('/var/run/secrets/kubernetes.io/serviceaccount/token').trim()
+            sh "jenkinsToken = \$(cat /etc/jenkins/token)"
+
+            echo $jenkinToken
 
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
@@ -50,14 +54,14 @@ def call(body) {
 
 
             echo "Openshift Tag image with custom version number..."
-    	    stage('tag image') {
-                echo "Check out source code..."
-                checkout scm
+    	    //stage('tag image') {
+            //    echo "Check out source code..."
+            //    checkout scm
 
-                echo "readFile version "
-                def VERSION = readFile 'version'
-                echo "$VERSION"
-	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
+            //    echo "readFile version "
+            //    def VERSION = readFile 'version'
+            //    echo "$VERSION"
+	    //    openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
      	    }
 
 	    echo "openshift import image at TPAAS..."
@@ -65,7 +69,7 @@ def call(body) {
 	        pipelineUtils.login(ocpUrl, jenkinsToken)
 	     
                 sh """
-    	           oc project ${config.namespace}
+    	           oc project "${config.deployNamespace}"
 
                    oc process -f pengg-openshift/pengg-openshift-system/openshift/templates/pengg-spog-dc.yml \
                     NAME=${config.base} APPLICATION_IS_TAG_WEB="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_TAG_API="${config.microservice}:${config.sourceRepositoryRef}" APPLICATION_IS_NM_WEB=${config.namespace} | oc apply -f - 
@@ -77,10 +81,10 @@ def call(body) {
 	    echo "openshift deployement to TPAAS .."
             stage('deploy to TPAAS') {
            
-		openshiftDeploy apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.namespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
+		openshiftDeploy apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace,  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
  	    	echo "Verifying the deployment in TPASS..."
-            	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.resourceName, namespace: config.namespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
+            	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	} // node
 
@@ -88,5 +92,6 @@ def call(body) {
         currentBuild.result = 'FAILED'
         throw err
     }
+  }
 
 }
