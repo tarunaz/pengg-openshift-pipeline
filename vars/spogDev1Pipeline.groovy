@@ -92,7 +92,7 @@ volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]
             	openshiftVerifyDeployment apiURL: $ocpUrl, depCfg: config.microservice, namespace: config.deployNamespace, replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	} // node
-      }
+      
 
     } catch (err) {
         currentBuild.result = 'FAILED'
