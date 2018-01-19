@@ -37,9 +37,7 @@ def call(body) {
       volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
         node('nodejs') {
           container('nodejs') {
-            // Clean workspace before doing anything
-            deleteDir()
-
+        
             // Skip TLS for Openshift Jenkins Plugin
             env.SKIP_TLS = 'true'
 
