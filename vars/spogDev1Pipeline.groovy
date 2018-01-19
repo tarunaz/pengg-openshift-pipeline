@@ -40,6 +40,8 @@ def call(body) {
            
 	    echo "openshiftbuild  Connect & Trigger openshift Buid in registry cluster..."
        	    stage('build spog') {
+                // Checkout source code
+ 	        checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'app-root']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: config.gitRepoUrl]]])
 		// Checkout openshift template files
                 checkout([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [[$class: 'RelativeTargetDirectory', relativeTargetDir: 'pengg-openshift']], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'a0abb0d8-4a01-4d4e-a4c7-90526325f245', url: 'git@github.com:tarunaz/pengg-openshift.git']]])
                 
@@ -50,12 +52,10 @@ def call(body) {
 
             echo "Openshift Tag image with custom version number..."
     	    stage('tag image') {
-                echo "Check out source code..."
-                checkout scm
-
                 echo "readFile version "	
                 def VERSION = readFile 'version'
-                echo "$VERSION"
+                
+		echo "$VERSION"
 	        openshiftTag alias: 'false', destStream: 'spog', destTag: "$VERSION", destinationNamespace: '', srcStream: 'spog', srcTag: 'dev1', verbose: 'false'
 	    }
 
