@@ -30,7 +30,10 @@ def call(body) {
 
     try {
 
-	volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
+      podTemplate(label: 'nodejs', cloud: 'ncr', containers: [
+  	 containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/home/jenkins')
+      ],
+      volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
 
         node('nodejs') {
             // Clean workspace before doing anything
