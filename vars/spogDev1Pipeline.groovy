@@ -14,7 +14,13 @@ import com.netapp.PipelineUtils
    * @param artifactoryRepoBaseURL Artifactory URL for push/pull of artifacts
    * @param artifactoryRepoName Artifactory repo name
    */
-def call(body) {
+
+podTemplate(label: 'nodejs', cloud: 'openshift', containers: [
+  containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/home/jenkins')
+],
+volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
+
+ def call(body) {
 
     def config = [:]
     body.resolveStrategy = Closure.DELEGATE_FIRST
@@ -29,11 +35,6 @@ def call(body) {
     def pipelineUtils = new PipelineUtils()
 
     try {
-
-      podTemplate(label: 'nodejs', cloud: 'ncr', containers: [
-  	 containerTemplate(name: 'nodejs', image: "registry.access.redhat.com/openshift3/jenkins-slave-nodejs-rhel7", ttyEnabled: true, command: 'cat', workingDir: '/home/jenkins')
-      ],
-      volumes: [secretVolume(secretName: 'tpaas-jenkinsa', mountPath: '/etc/jenkins')]) {
 
         node('nodejs') {
             // Clean workspace before doing anything
@@ -97,4 +98,5 @@ def call(body) {
         currentBuild.result = 'FAILED'
         throw err
     }
+ }
 }
