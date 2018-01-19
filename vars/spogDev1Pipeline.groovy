@@ -62,7 +62,7 @@ def call(body) {
 
 	    echo "openshift import image at TPAAS..."
 	    stage('import image to TPAAS') {
-                echo $jenkinsToken
+                echo "$jenkinsToken"
 	        pipelineUtils.login(ocpUrl, jenkinsToken)
 	     
                 sh """
