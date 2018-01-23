@@ -4,7 +4,7 @@ def login(String apiURL, String authToken) {
    
     sh """
         set -x
-        oc login --token=${authToken} ${apiURL} --cacert $(cat /var/run/secrets/kubernetes.io/serviceaccount/ca.crt)
+        oc login --token=${authToken} ${apiURL} --cacert /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
     """
     print "Login successful"
 }
