@@ -7,8 +7,6 @@ def call (body) {
   	body()
 
 	def jenkinsToken = readFile('/etc/jenkins/token')
-
-	sleep 200
                 
 	openshiftDeploy apiURL: config.ocpUrl, depCfg: config.microservice, namespace: config.namespace, authToken: "${jenkinsToken}",  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
