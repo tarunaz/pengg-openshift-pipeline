@@ -9,7 +9,7 @@ def call (body) {
         sh """
            oc project "${config.namespace}"
 
-           oc import-image 'tarun-spog:${version}' --from=registry.netapp.com/nss/tarun-spog:${version} --confirm
+           oc import-image 'tarun-spog:$config.{version}' --from=registry.netapp.com/nss/tarun-spog:${config.version} --confirm
     	"""
 	  
  }
