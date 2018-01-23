@@ -22,7 +22,7 @@ def unitTestAndPackageJar(String mavenCredentialsId, String pomPath, String mave
     }
 }
 
-def processOpenshiftTemplates(String templatePath, String parameters, String project) {
+def processOcpTemplates(String templatePath, String parameters, String project) {
     stage("Process OCP templates"){
         print "Process OpenShift templates..."
         sh """
@@ -31,7 +31,7 @@ def processOpenshiftTemplates(String templatePath, String parameters, String pro
     }
 }
 
-def startOpenshiftBuild(String project, String buildConfigName) {
+def startOcpBuild(String project, String buildConfigName) {
     stage("OCP Build"){
         print "Building in OpenShift..."
         sh """

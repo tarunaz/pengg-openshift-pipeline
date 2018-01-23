@@ -9,7 +9,7 @@ def call (body) {
         body()
                           
 	//Start build
-        pipelineUtils.startOpenshiftBuild(config.namespace, config.buildConfigName)
+        pipelineUtils.startOcpBuild(config.namespace, config.buildConfigName)
  }
 
 
