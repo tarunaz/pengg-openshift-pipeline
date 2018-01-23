@@ -23,22 +23,20 @@ def unitTestAndPackageJar(String mavenCredentialsId, String pomPath, String mave
 }
 
 def processOcpTemplates(String templatePath, String parameters, String project) {
-    stage("Process OCP templates"){
-        print "Process OpenShift templates..."
-        sh """
-            oc process -f ${templatePath} ${parameters} -n ${project} | oc apply -f - -n ${project}
-        """
-    }
+
+    print "Process OpenShift templates..."
+    sh """
+        oc process -f ${templatePath} ${parameters} -n ${project} | oc apply -f - -n ${project}
+    """
 }
 
 def startOcpBuild(String project, String buildConfigName) {
-    stage("OCP Build"){
-        print "Building in OpenShift..."
-        sh """
-            oc start-build ${buildConfigName} --follow -n ${project}
-        """
-        //openshiftBuild bldCfg: ${buildConfigName}, showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
-    }
+
+    print "Building in OpenShift..."
+    sh """
+       oc start-build ${buildConfigName} --follow -n ${project}
+    """
+    //openshiftBuild bldCfg: ${buildConfigName}, showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
 }
 
 
