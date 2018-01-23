@@ -5,10 +5,6 @@ def call (String version) {
     	body.resolveStrategy = Closure.DELEGATE_FIRST
     	body.delegate = config
   	body()
-       
-	def pipelineUtils = new PipelineUtils()
-
-        pipelineUtils.login(ocpUrl, jenkinsToken)
      
         sh """
            oc project "${config.namespace}"
