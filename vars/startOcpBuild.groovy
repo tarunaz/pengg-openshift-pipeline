@@ -8,6 +8,8 @@ def call (body) {
     	body.delegate = config
         body()
                           
+	def pipelineUtils = new PipelineUtils()
+
 	//Start build
         pipelineUtils.startOcpBuild(config.namespace, config.buildConfigName)
  }
