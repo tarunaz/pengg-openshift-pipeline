@@ -1,7 +1,7 @@
 package com.netapp
 
 def login(String apiURL, String authToken) {
-    print "${apiUrl}"
+    print ${apiUrl}
     sh """
         set -x
         oc login --token=${authToken} ${apiURL} >/dev/null 2>&1 || echo 'OpenShift login failed'
