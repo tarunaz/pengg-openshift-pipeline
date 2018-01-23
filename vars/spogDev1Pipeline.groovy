@@ -82,7 +82,7 @@ def call(body) {
 		openshiftDeploy apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, authToken: "${jenkinsToken}",  verbose: 'true', waitTime: '', waitUnit: 'sec'
           		
  	    	echo "Verifying the deployment in TPASS..."
-            	openshiftVerifyDeployment apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, authToken: "${jenkinsToken}", replicaCount: '2', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
+            	openshiftVerifyDeployment apiURL: "${ocpUrl}", depCfg: config.microservice, namespace: config.deployNamespace, authToken: "${jenkinsToken}", replicaCount: '1', verbose: 'true', verifyReplicaCount: 'true', waitTime: '900', waitUnit: 'sec'
 	    }
 	  } // node
     } catch (err) {
