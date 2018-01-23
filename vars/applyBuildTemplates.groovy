@@ -2,19 +2,14 @@
 
 import com.netapp.PipelineUtils
 
-def call (String gitRepoUrl, String sourceRepositoryRef, String gitPullSecret, String deployNamespace,
-	String emailAddress, String buildNamespace, String microservice) {
+def call (Map config) {
                 
 	def pipelineUtils = new PipelineUtils()
 
 	def jenkinsToken = readFile('/etc/jenkins/token')
                 
-	def parameters = "BASE=${microservice} SOURCE_REPOSITORY_URL=${gitRepoUrl} SOURCE_REPOSITORY_REF=${sourceRepositoryRef} GIT_PULL_SECRET=${gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${deployNamespace} authToken=${jenkinsToken} email_Address=${emailAddress}"
-
-	echo ${parameters}
-
 	//Process templates and start build
-        pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml", ${parameters}, ${buildNamespace}, "${microservice}-${sourceRepositoryRef}")
+        pipelineUtils.processTemplateAndStartBuild("pengg-openshift/pengg-openshift-system/openshift/templates/pengg-runtime-bc-spog.yaml", "BASE=${config.microservice} SOURCE_REPOSITORY_URL=${config.gitRepoUrl} SOURCE_REPOSITORY_REF=${config.sourceRepositoryRef} GIT_PULL_SECRET=${config.gitPullSecret} ANGULAR_HOME_DIR=web Version_File_Loc=version DEST_DEPLOY_NAMESPACE=${config.deployNamespace} authToken=${jenkinsToken} email_Address=${config.emailAddress}", ${config.buildNamespace}, "$config.{microservice}-${config.sourceRepositoryRef}")
 
  }
 
