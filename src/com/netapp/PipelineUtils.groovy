@@ -22,16 +22,25 @@ def unitTestAndPackageJar(String mavenCredentialsId, String pomPath, String mave
     }
 }
 
-def processTemplateAndStartBuild(String templatePath, String parameters, String project, String buildConfigName) {
+def processOpenShiftTemplates(String templatePath, String parameters, String project) {
+    stage("Process OCP templates"){
+        print "Process OpenShift templates..."
+        sh """
+            oc process -f ${templatePath} ${parameters} -n ${project} | oc apply -f - -n ${project}
+        """
+    }
+}
+
+def startBuild(String project, String buildConfigName) {
     stage("OCP Build"){
         print "Building in OpenShift..."
         sh """
-            oc process -f ${templatePath} ${parameters} -n ${project} | oc apply -f - -n ${project}
             oc start-build ${buildConfigName} --follow -n ${project}
         """
         //openshiftBuild bldCfg: ${buildConfigName}, showBuildLogs: 'true', waitTime: '15', waitUnit: 'min'
     }
 }
+
 
 
 def triggerDeploymentAndVerify(String microservice, String project,
