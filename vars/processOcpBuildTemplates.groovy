@@ -2,11 +2,11 @@
 
 import com.netapp.PipelineUtils
 
-def call (body) {
-       def config = [:]
+def call (Map config) {
+        /*def config = [:]
     	body.resolveStrategy = Closure.DELEGATE_FIRST
     	body.delegate = config
-  	body()
+  	body()*/
                 
 	def pipelineUtils = new PipelineUtils()
 
