@@ -9,6 +9,8 @@ def call (body) {
         body()
                           
 	def pipelineUtils = new PipelineUtils()
+	
+	def buildConfigName = "${microservice}-${sourceRepositoryRef}"	
 
 	//Start build
         pipelineUtils.startOcpBuild(config.namespace, config.buildConfigName)
