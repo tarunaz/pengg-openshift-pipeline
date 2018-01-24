@@ -10,8 +10,6 @@ def call (body) {
                           
 	def pipelineUtils = new PipelineUtils()
 	
-	def buildConfigName = Constants.MICROSERVICE + '-' + Constants.GIT_SRC_REPOSITORY_REF
-
 	//Start build
         pipelineUtils.startOcpBuild(config.namespace, config.buildConfigName)
  }
