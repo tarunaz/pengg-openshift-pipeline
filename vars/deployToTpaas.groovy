@@ -6,6 +6,9 @@ def call (body) {
     	body.delegate = config
   	body()
 
+	// Skip TLS for Openshift Jenkins Plugin
+ 	env.SKIP_TLS = 'true'
+
 	def jenkinsToken = readFile('/etc/jenkins/token')
                 
 	openshiftDeploy apiURL: config.ocpUrl, depCfg: config.microservice, namespace: config.namespace, authToken: "${jenkinsToken}",  verbose: 'true', waitTime: '', waitUnit: 'sec'

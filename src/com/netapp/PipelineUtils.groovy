@@ -1,12 +1,10 @@
 package com.netapp
 
 def login(String apiURL, String authToken) {
-   
     sh """
         set -x
-        oc login --token=${authToken} ${apiURL} ----certificate-authority=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        oc login --token=${authToken} ${apiURL} --insecure-skip-tls-verify >/dev/null 2>&1 || echo 'OpenShift login failed'
     """
-    print "Login successful"
 }
 
 /**
