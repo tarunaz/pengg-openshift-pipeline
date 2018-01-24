@@ -2,16 +2,14 @@
 
 import com.netapp.PipelineUtils
 
-def call (body) {
-        def config = [:]
-    	body.resolveStrategy = Closure.DELEGATE_FIRST
-    	body.delegate = config
-        body()
-                          
+def call (Map config) {
+                            
 	def pipelineUtils = new PipelineUtils()
+
+	def buildConfigName = config.microservice + '-' config.sourceRepositoryRef
 	
 	//Start build
-        pipelineUtils.startOcpBuild(config.namespace, config.buildConfigName)
+        pipelineUtils.startOcpBuild(config.buildNamespace, buildConfigName)
  }
 
 

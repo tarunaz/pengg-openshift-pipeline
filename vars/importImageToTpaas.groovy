@@ -1,13 +1,9 @@
 #!/usr/bin/env groovy
 
-def call (body) {
-        def config = [:]
-    	body.resolveStrategy = Closure.DELEGATE_FIRST
-    	body.delegate = config
-  	body()
-     
+def call (Map config) {
+           
         sh """
-           oc project "${config.namespace}"
+           oc project "${config.deployNamespace}"
 
            oc import-image 'tarun-spog:${config.version}' --from=registry.netapp.com/nss/tarun-spog:${config.version} --confirm
     	"""
