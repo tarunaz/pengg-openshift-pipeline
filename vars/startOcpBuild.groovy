@@ -6,10 +6,10 @@ def call () {
                             
 	def pipelineUtils = new PipelineUtils()
 
-	def buildConfigName = config.microservice + '-' + config.sourceRepositoryRef
+	def buildConfigName = "${BASE}" + '-' + "${SOURCE_REPOSITORY_REF}"
 	
 	//Start build
-        pipelineUtils.startOcpBuild(config.buildNamespace, buildConfigName)
+        pipelineUtils.startOcpBuild("${BUILD_NAMESPACE}, buildConfigName)
  }
 
 
