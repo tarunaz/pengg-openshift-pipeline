@@ -9,7 +9,7 @@ def call () {
 	def buildConfigName = "${BASE}" + '-' + "${SOURCE_REPOSITORY_REF}"
 	
 	//Start build
-        pipelineUtils.startOcpBuild("${BUILD_NAMESPACE}, buildConfigName)
+        pipelineUtils.startOcpBuild("${BUILD_NAMESPACE}", buildConfigName)
  }
 
 
