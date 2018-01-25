@@ -2,7 +2,7 @@
 
 import com.netapp.PipelineUtils
 
-def call (Map config) {
+def call () {
       
 	def pipelineUtils = new PipelineUtils() 
 

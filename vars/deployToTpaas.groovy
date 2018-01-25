@@ -1,6 +1,6 @@
 #!/usr/bin/env groovy
 
-def call (Map config) {
+def call () {
    
 	// Skip TLS for Openshift Jenkins Plugin
  	env.SKIP_TLS = 'true'
