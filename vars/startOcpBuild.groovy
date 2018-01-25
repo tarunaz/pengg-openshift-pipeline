@@ -3,7 +3,9 @@
 import com.netapp.PipelineUtils
 
 def call () {
-                            
+
+	echo "Start OpenShift build"
+      
 	def pipelineUtils = new PipelineUtils()
 
 	def buildConfigName = "${BASE}" + '-' + "${SOURCE_REPOSITORY_REF}"

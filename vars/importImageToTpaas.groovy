@@ -2,6 +2,8 @@
 
 def call () {
            
+	echo "Import OpenShift Image to TPAAS"
+	
         sh """
            oc project "${DEPLOY_NAMESPACE}"
 

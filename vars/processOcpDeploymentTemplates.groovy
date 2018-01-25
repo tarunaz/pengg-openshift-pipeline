@@ -3,6 +3,8 @@
 import com.netapp.PipelineUtils
 
 def call () {
+	
+	echo "Process OpenShift Deployment templates"
       
 	def pipelineUtils = new PipelineUtils() 
 

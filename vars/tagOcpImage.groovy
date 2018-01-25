@@ -2,6 +2,8 @@
 
 def call () {
        
+	echo "Tag OpenShift Image"
+	
 	def branch = '*/' + "${SOURCE_REPOSITORY_REF}"
 
          // Checkout source code for version file

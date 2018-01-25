@@ -2,6 +2,8 @@
 
 def call () {
    
+	echo "Deploy to TPAAS"
+
 	// Skip TLS for Openshift Jenkins Plugin
  	env.SKIP_TLS = 'true'
 
