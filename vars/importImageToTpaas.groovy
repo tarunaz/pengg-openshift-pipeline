@@ -3,9 +3,9 @@
 def call (Map config) {
            
         sh """
-           oc project "${config.deployNamespace}"
+           oc project "${DEPLOY_NAMESPACE}"
 
-           oc import-image 'tarun-spog:${config.version}' --from=registry.netapp.com/nss/tarun-spog:${config.version} --confirm
+           oc import-image "${BASE}":"${VERSION}" --from=registry.netapp.com/nss/"${BASE}":"${VERSION}"} --confirm
     	"""
 	  
  }
