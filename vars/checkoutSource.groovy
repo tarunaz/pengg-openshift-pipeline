@@ -1,5 +1,7 @@
 #!/usr/bin/env groovy
 
+import com.netapp.PipelineUtils
+
 def call (String gitRepoUrl) {
 
 	 echo "Checkout source and openshift templates"
