@@ -2,7 +2,7 @@
 
 import com.netapp.PipelineUtils
 
-def call () {
+def call (body) {
                      
 	def pipelineUtils = new PipelineUtils()
 
